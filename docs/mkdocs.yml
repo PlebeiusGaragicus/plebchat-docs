@@ -1,0 +1,48 @@
+site_name: PlebChat
+site_description: A simple AI chat application with ecash micropayments
+site_url: https://PlebeiusGaragicus.github.io/plebchat-site/
+repo_url: https://github.com/PlebeiusGaragicus/plebchat-site
+repo_name: plebchat-site
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: orange
+      accent: orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: orange
+      accent: orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Features:
+    - User Interface: features/user-interface.md
+    - Deep Research: features/deep-research.md
+    - Payment Backend: features/payment-backend.md
+    - Thread Sync: features/thread-sync.md
+  - Agents: agents.md
