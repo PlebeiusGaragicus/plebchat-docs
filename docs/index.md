@@ -8,7 +8,7 @@
 
 **PlebChat** is a simple AI chat web application that demonstrates:
 
- - A Svelte 5 client-side SPA in `frontend/` (no server-side rendering) with a "CypherTap" library used to handle user login, bitcoin ecash wallet and micropayments for pay-per-use AI usage. Builds to static files deployable on any static host.
+ - A Svelte 5 client-side SPA in `frontend/` (no server-side rendering) with a "plebtap" library used to handle user login, bitcoin ecash wallet and micropayments for pay-per-use AI usage. Builds to static files deployable on any static host.
  - A Python3.12 FastAPI `backend/` used to validate/redeem ecash tokens, calculate pricing, and generate refunds
  - LangGraph `agents/` are LLM graphs that verify ecash before execution and refund unused sats after
 
@@ -77,7 +77,7 @@ Pricing and credentials are configured centrally in `backend/data/models.json`:
 ## Features:
 
  * A top navbar shows "PlebChat" in the top left corner with a dropdown/popover to its right that allows the user to select an agent.  A "Help me choose" is available which shows an FAQ in the main content area with links to each suggested agent.
- * On right edge of the top navbar we place our CypherTap component.  When logged out the main content area shows "welcome" to plebchat content with a beautiful explanation of the site.  Once logged in we select the latest agent selected in the dropdown - if site previously visited - and the "help me choose" option otherwise.
+ * On right edge of the top navbar we place our plebtap component.  When logged out the main content area shows "welcome" to plebchat content with a beautiful explanation of the site.  Once logged in we select the latest agent selected in the dropdown - if site previously visited - and the "help me choose" option otherwise.
  * The main content area shows a collapsing sidepanel that shows preveious chat threads for the selected agent (if saved).
  * Once an agent is selected a beautiful and minimal interface allows them to enter a prompt. Faint mouse trails are enabled which appear to energize the digital/binary background behind them. The input box appears to glow and invites the user to ask, learn and engage.  A settings gear icon embedded in the prompt input box activates a modal which allows the user to adjust the configuration of the currently selected agent, with a "Use settings for this chat" and "Save agent configuration" options.
  * Similarly to the example repositories, the agent's tool calls displayed inline in the chat history.

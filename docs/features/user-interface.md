@@ -10,7 +10,7 @@
 │  │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐   │  │
 │  │  │     Navbar      │  │   MouseTrail    │  │  Toast Notifs   │   │  │
 │  │  │  (AgentDropdown │  │   (glow effect) │  │  (svelte-sonner)│   │  │
-│  │  │   + Cyphertap)  │  │                 │  │                 │   │  │
+│  │  │   + plebtap)  │  │                 │  │                 │   │  │
 │  │  └─────────────────┘  └─────────────────┘  └─────────────────┘   │  │
 │  └───────────────────────────────────────────────────────────────────┘  │
 │                                    │                                     │
@@ -42,7 +42,7 @@
 │                    ┌───────────────┴───────────────┐                    │
 │                    ▼                               ▼                    │
 │  ┌─────────────────────────────┐  ┌─────────────────────────────────┐  │
-│  │       Svelte Stores         │  │         Cyphertap               │  │
+│  │       Svelte Stores         │  │         plebtap               │  │
 │  │  ┌───────────────────────┐  │  │  - Nostr login                  │  │
 │  │  │ agent.ts (selection)  │  │  │  - Ecash wallet                 │  │
 │  │  │ threads.ts (history)  │  │  │  - Token generation             │  │
@@ -70,7 +70,7 @@
 | Tailwind CSS | 4.0.0 | Utility-first styling |
 | TypeScript | 5.9.3 | Type safety |
 | LangGraph SDK | 0.0.43 | AI agent streaming |
-| Cyphertap | local | Bitcoin/ecash wallet |
+| plebtap | local | Bitcoin/ecash wallet |
 | Bits UI | 2.9.4 | Accessible components |
 | Lucide Svelte | 0.515.0 | Icon library |
 | Svelte Sonner | 1.0.5 | Toast notifications |
@@ -100,7 +100,7 @@ The frontend is a **pure client-side SPA** with no server-side rendering:
 └─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
        │                   │                   │                   │
        ▼                   ▼                   ▼                   ▼
-  WelcomePage         ChatContainer      Cyphertap          ChatMessage
+  WelcomePage         ChatContainer      plebtap          ChatMessage
   (feature grid)      (empty state)      generates          (streaming
                                          ecash token        with cursor)
 ```
@@ -110,7 +110,7 @@ The frontend is a **pure client-side SPA** with no server-side rendering:
 1. **Landing**: User sees WelcomePage with feature grid (Pay Per Use, Self Custody, No Accounts, etc.)
 2. **Agent Selection**: User selects an AI agent from the grid or dropdown
 3. **Chat Interface**: ChatContainer displays with input field showing prompt cost
-4. **Payment**: On send, Cyphertap generates ecash token for the prompt cost
+4. **Payment**: On send, plebtap generates ecash token for the prompt cost
 5. **Streaming**: LangGraph streams response chunks, displayed in real-time
 6. **History**: Conversation saved to LocalStorage, accessible via ThreadSidebar
 
@@ -404,7 +404,7 @@ Fixed top navigation bar.
 - PlebChat logo with Zap icon (links to welcome)
 - AgentDropdown for agent selection
 - Testing mode badge (shows when active)
-- Cyphertap wallet component
+- plebtap wallet component
 - Sticky positioning (z-index 50)
 
 #### AgentDropdown
@@ -684,9 +684,9 @@ Each agent defines its capabilities and file upload support:
 
 ## Payment Integration
 
-### Cyphertap Wallet
+### plebtap Wallet
 
-The frontend integrates with Cyphertap for Bitcoin/ecash payments.
+The frontend integrates with plebtap for Bitcoin/ecash payments.
 
 **Features:**
 - Nostr-based login (no accounts)
@@ -703,7 +703,7 @@ The frontend uses a **backend proxy** architecture:
 1. Frontend fetches upfront_sats from backend on load
 2. User enters message
 3. User clicks Send
-4. ChatContainer calls cyphertap.generateEcashToken(upfront_sats)
+4. ChatContainer calls plebtap.generateEcashToken(upfront_sats)
 5. Frontend calls POST /api/agent/start/{graph_id} with message + token
 6. Backend validates payment, starts LangGraph run
 7. Backend returns run_id, thread_id to frontend

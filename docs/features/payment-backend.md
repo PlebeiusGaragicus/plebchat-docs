@@ -460,7 +460,7 @@ PlebChat uses a **non-custodial** design:
 ┌─────────────────────────────────────────────────────────────────┐
 │                        CLIENT SIDE                               │
 │  ┌─────────────────────────────────────────────────────────┐    │
-│  │                    CypherTap Component                   │    │
+│  │                    plebtap Component                   │    │
 │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐  │    │
 │  │  │ User Wallet │  │   Tokens    │  │  Mint (testnut) │  │    │
 │  │  │ (browser)   │──│   (ecash)   │──│                 │  │    │
@@ -496,7 +496,7 @@ PlebChat uses a **non-custodial** design:
 
 ### Key Principles
 
-1. **Client holds funds**: CypherTap stores user tokens in the browser
+1. **Client holds funds**: plebtap stores user tokens in the browser
 2. **Pay-upfront model**: User overpays, gets refunded the difference
 3. **Session-secured refunds**: Payment sessions prevent refund exploits
 4. **Backend is authoritative**: All pricing comes from backend `/api/pricing`

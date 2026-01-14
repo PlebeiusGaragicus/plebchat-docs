@@ -54,7 +54,7 @@ Frontend → Frontend: Import to localStorage
    - `method` tag: The HTTP method (GET, POST, etc.)
    - Content: Empty string
 
-2. **Client signs event**: Using their Nostr keypair (via CypherTap)
+2. **Client signs event**: Using their Nostr keypair (via plebtap)
 
 3. **Client sends request**: With `Authorization: Nostr <base64-encoded-event>`
 
@@ -197,7 +197,7 @@ if (result.success) {
 ## Troubleshooting
 
 ### "Please log in to sync threads"
-You must be logged in with CypherTap to sync threads. Your keypair is required for authentication.
+You must be logged in with plebtap to sync threads. Your keypair is required for authentication.
 
 ### "Thread sync is only available in Sync mode"
 Switch to Sync mode using the privacy mode popover. Paranoid and Incognito modes don't store pubkey metadata.
