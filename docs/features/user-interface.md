@@ -10,39 +10,32 @@
 │  │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐   │  │
 │  │  │     Navbar      │  │   MouseTrail    │  │  Toast Notifs   │   │  │
 │  │  │  (AgentDropdown │  │   (glow effect) │  │  (svelte-sonner)│   │  │
-│  │  │   + plebtap)  │  │                 │  │                 │   │  │
+│  │  │   + plebtap)    │  │                 │  │                 │   │  │
 │  │  └─────────────────┘  └─────────────────┘  └─────────────────┘   │  │
 │  └───────────────────────────────────────────────────────────────────┘  │
 │                                    │                                     │
-│                                    ▼                                     │
-│  ┌───────────────────────────────────────────────────────────────────┐  │
-│  │                          +page.svelte                              │  │
-│  │                                                                    │  │
-│  │   ┌──────────────────┐          ┌──────────────────────────────┐  │  │
-│  │   │  ThreadSidebar   │          │  WelcomePage (if no agent)   │  │  │
-│  │   │  - Thread list   │          │  - Feature grid              │  │  │
-│  │   │  - New chat      │          │  - Agent selection           │  │  │
-│  │   │  - Delete        │          └──────────────────────────────┘  │  │
-│  │   └──────────────────┘                       OR                   │  │
-│  │                                 ┌──────────────────────────────┐  │  │
-│  │                                 │  ChatContainer (if agent)    │  │  │
-│  │                                 │  ┌────────────────────────┐  │  │  │
-│  │                                 │  │  ChatMessage (list)    │  │  │  │
-│  │                                 │  │  - User/AI/Tool types  │  │  │  │
-│  │                                 │  │  - ToolCallDisplay     │  │  │  │
-│  │                                 │  └────────────────────────┘  │  │  │
-│  │                                 │  ┌────────────────────────┐  │  │  │
-│  │                                 │  │  ChatInput             │  │  │  │
-│  │                                 │  │  - Cost display        │  │  │  │
-│  │                                 │  │  - Send button         │  │  │  │
-│  │                                 │  └────────────────────────┘  │  │  │
-│  │                                 └──────────────────────────────┘  │  │
-│  └───────────────────────────────────────────────────────────────────┘  │
+│          ┌─────────────────────────┼─────────────────────────┐          │
+│          ▼                         ▼                         ▼          │
+│  ┌───────────────┐      ┌───────────────────────────────────────────┐  │
+│  │ /             │      │ /[agent] (e.g., /chat, /deep-research)    │  │
+│  │ +page.svelte  │      │ +page.svelte + +page.ts                   │  │
+│  │               │      │                                           │  │
+│  │ ┌───────────┐ │      │ ┌──────────────┐  ┌────────────────────┐ │  │
+│  │ │WelcomePage│ │      │ │ThreadSidebar │  │   ChatContainer    │ │  │
+│  │ │- Features │ │      │ │- Thread list │  │  ┌──────────────┐  │ │  │
+│  │ │- Agent    │ │      │ │- New chat    │  │  │ ChatMessage  │  │ │  │
+│  │ │  grid     │ │      │ │- Delete      │  │  │ (list)       │  │ │  │
+│  │ └───────────┘ │      │ └──────────────┘  │  └──────────────┘  │ │  │
+│  └───────────────┘      │                   │  ┌──────────────┐  │ │  │
+│                         │                   │  │  ChatInput   │  │ │  │
+│                         │                   │  └──────────────┘  │ │  │
+│                         │                   └────────────────────┘ │  │
+│                         └───────────────────────────────────────────┘  │
 │                                    │                                     │
 │                    ┌───────────────┴───────────────┐                    │
 │                    ▼                               ▼                    │
 │  ┌─────────────────────────────┐  ┌─────────────────────────────────┐  │
-│  │       Svelte Stores         │  │         plebtap               │  │
+│  │       Svelte Stores         │  │         plebtap                 │  │
 │  │  ┌───────────────────────┐  │  │  - Nostr login                  │  │
 │  │  │ agent.ts (selection)  │  │  │  - Ecash wallet                 │  │
 │  │  │ threads.ts (history)  │  │  │  - Token generation             │  │
@@ -96,23 +89,41 @@ The frontend is a **pure client-side SPA** with no server-side rendering:
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
 │   User      │     │   Select    │     │   Send      │     │   Receive   │
 │   Visits    │────▶│   Agent     │────▶│   Message   │────▶│   Response  │
-│   Site      │     │             │     │   + Payment │     │   Stream    │
+│   Site      │     │  (navigate) │     │   + Payment │     │   Stream    │
 └─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
        │                   │                   │                   │
        ▼                   ▼                   ▼                   ▼
-  WelcomePage         ChatContainer      plebtap          ChatMessage
-  (feature grid)      (empty state)      generates          (streaming
-                                         ecash token        with cursor)
+  / (WelcomePage)     /chat or           plebtap          ChatMessage
+  (feature grid)      /deep-research     generates          (streaming
+                      (ChatContainer)    ecash token        with cursor)
 ```
+
+### Route Structure
+
+The frontend uses **route-based agent navigation** (client-side only, no SSR):
+
+| Route | Component | Purpose |
+|-------|-----------|--------|
+| `/` | WelcomePage | Landing page with features and agent selection |
+| `/chat` | ChatContainer | Chat agent interface |
+| `/deep-research` | ChatContainer | Deep Research agent interface |
+| `/socratic-coach` | ChatContainer | Socratic Coach agent interface |
+| `/faq` | FAQ content | Frequently asked questions |
+| `/privacy-policy` | Static content | Privacy policy |
+| `/terms-of-service` | Static content | Terms of service |
+
+**Dynamic route:** `/[agent]/+page.ts` validates the agent slug and selects it in the store before rendering.
 
 ### User Journey
 
-1. **Landing**: User sees WelcomePage with feature grid (Pay Per Use, Self Custody, No Accounts, etc.)
-2. **Agent Selection**: User selects an AI agent from the grid or dropdown
+1. **Landing**: User visits `/` and sees WelcomePage with feature grid
+2. **Agent Selection**: User clicks an agent → navigates to `/chat`, `/deep-research`, etc.
 3. **Chat Interface**: ChatContainer displays with input field showing prompt cost
 4. **Payment**: On send, plebtap generates ecash token for the prompt cost
 5. **Streaming**: LangGraph streams response chunks, displayed in real-time
 6. **History**: Conversation saved to LocalStorage, accessible via ThreadSidebar
+7. **Agent Switching**: AgentDropdown navigates to different agent routes
+8. **Return Home**: Logo click or "Help me choose" navigates back to `/`
 
 ---
 
@@ -409,13 +420,14 @@ Fixed top navigation bar.
 
 #### AgentDropdown
 
-Dropdown menu for agent selection.
+Dropdown menu for agent selection and navigation.
 
 **Features:**
-- "Help me choose" option (shows WelcomePage)
+- "Help me choose" option (navigates to `/` WelcomePage)
 - Agent list with:
   - Emoji and name
   - Lock icon for unavailable agents
+  - Clicking available agent navigates to `/[agent-id]`
   - Cost display (initial + per prompt)
   - Checkmark for selected
 - Click-outside to close
@@ -502,10 +514,10 @@ interface ModelInfo {
 Manages the currently selected AI agent.
 
 **Key Features:**
-- LocalStorage persistence (`plebchat-selected-agent`)
-- Predefined agent configurations
-- Agent selection with auto-save
-- "Clear" action to return to welcome
+- Predefined agent configurations (BUILTIN_AGENTS)
+- Agent selection synced from route params via `+page.ts`
+- "Clear" action to deselect (used when navigating home)
+- **Note:** Agent selection is now driven by URL routes, not localStorage
 
 **Agent Interface:**
 ```typescript
