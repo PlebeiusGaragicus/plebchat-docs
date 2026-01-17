@@ -39,12 +39,13 @@ PlebChat uses a **pay-upfront, refund-difference** model:
 
 ### Dynamic Pricing
 
-Pricing and credentials are configured centrally in `backend/data/models.json`:
+Pricing is configured in `backend/data/models.json` (array format with capabilities):
 
 ```json
 {
-  "models": {
-    "grok-4-1-fast-non-reasoning": {
+  "models": [
+    {
+      "id": "grok-4-1-fast-non-reasoning",
       "provider": "xai",
       "display_name": "Grok 4.1 Fast",
       "base_url": "https://api.x.ai/v1",
@@ -53,25 +54,49 @@ Pricing and credentials are configured centrally in `backend/data/models.json`:
         "input_usd_per_million": 0.2,
         "output_usd_per_million": 0.5
       },
-      "modalities": ["text"],
+      "capabilities": {
+        "modalities": ["text"],
+        "tool_use": true,
+        "streaming": true
+      },
       "max_context_tokens": 131072,
       "enabled": true
     }
-  },
-  "default_model": "grok-4-1-fast-non-reasoning",
-  "upfront_sats": {
-    "default": 8,
-    "chat": 8,
-    "deep-research": 50
-  }
+  ],
+  "default_model": "grok-4-1-fast-non-reasoning"
 }
 ```
 
-- **Frontend fetches pricing** from backend via `/api/pricing/models`
+Agent configuration is in `backend/data/agents.json`:
+
+```json
+{
+  "agents": [
+    {
+      "id": "chat",
+      "name": "Chat",
+      "emoji": "💬",
+      "description": "AI chat with customizable personality",
+      "enabled": true,
+      "upfront_sats": 8,
+      "nodes": {
+        "llm": {
+          "required_capabilities": { "modalities": ["text"], "tool_use": false },
+          "default_model": "grok-4-1-fast-non-reasoning"
+        }
+      }
+    }
+  ],
+  "default_agent": "chat"
+}
+```
+
+- **Frontend fetches agents** from backend via `/api/agent/agents`
+- **Frontend fetches models** from backend via `/api/pricing/models`
 - **No hardcoded prices** in frontend - all pricing is backend-authoritative
 - **API keys never reach frontend** - injected server-side via backend proxy
-- **BTC price conversion** - USD prices converted to sats using current BTC rate
-- **Power of 2 upfront** - Using 8 sats minimizes Cashu swap fees
+- **Capability-based model selection** - Agents specify required capabilities, not explicit model lists
+- **Demo mode fallback** - If backend unavailable, frontend uses demo agents with pre-recorded responses
 
 
 ## Features:

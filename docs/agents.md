@@ -40,14 +40,19 @@ Uses xAI's Grok API.
 XAI_API_KEY=your-xai-api-key            # Get from https://console.x.ai/
 ```
 
-### Model Configuration
+## Configuration Files
 
-Models are configured in `backend/data/models.json` with API credentials:
+The backend uses two configuration files in `backend/data/`:
+
+### Model Configuration (models.json)
+
+Models are configured as an **array** with explicit IDs and capabilities:
 
 ```json
 {
-  "models": {
-    "grok-4-1-fast-non-reasoning": {
+  "models": [
+    {
+      "id": "grok-4-1-fast-non-reasoning",
       "provider": "xai",
       "display_name": "Grok 4.1 Fast",
       "base_url": "https://api.x.ai/v1",
@@ -56,28 +61,158 @@ Models are configured in `backend/data/models.json` with API credentials:
         "input_usd_per_million": 0.2,
         "output_usd_per_million": 0.5
       },
-      "modalities": ["text"],
+      "capabilities": {
+        "modalities": ["text"],
+        "tool_use": true,
+        "streaming": true
+      },
       "max_context_tokens": 131072,
       "enabled": true
     }
-  },
+  ],
   "default_model": "grok-4-1-fast-non-reasoning",
   "upfront_sats": {
     "default": 8,
     "chat": 8,
-    "deep-research": 50
+    "deep-research": 50,
+    "socratic-coach": 8
   }
 }
 ```
 
 **Key fields:**
+- `id`: Unique model identifier
 - `api_key` / `base_url`: Support `${ENV_VAR}` syntax for environment variable expansion
 - `pricing`: Nested object with input/output USD pricing per million tokens
-- `modalities`: Array of supported modes (`text`, `vision`)
+- `capabilities`: Object with `modalities`, `tool_use`, and `streaming` flags
 - `max_context_tokens`: Model's context window size
 - `upfront_sats`: Per-agent upfront costs (power of 2 recommended)
 
-The frontend fetches available models from `GET /api/pricing/models` and displays them in the settings drawer. **API keys are never exposed to frontend** - only injected server-side.
+### Agent Configuration (agents.json)
+
+Agents are configured separately from models, with capability-based model selection:
+
+```json
+{
+  "agents": [
+    {
+      "id": "chat",
+      "name": "Chat",
+      "emoji": "💬",
+      "description": "AI chat with customizable personality",
+      "enabled": true,
+      "upfront_sats": 8,
+      "file_upload": "none",
+      "nodes": {
+        "llm": {
+          "required_capabilities": {
+            "modalities": ["text"],
+            "tool_use": false
+          },
+          "default_model": "grok-4-1-fast-non-reasoning"
+        }
+      }
+    },
+    {
+      "id": "deep-research",
+      "name": "Deep Research",
+      "emoji": "🌎📚🔭",
+      "description": "Deep research agent for comprehensive internet research.",
+      "enabled": true,
+      "upfront_sats": 50,
+      "file_upload": "none",
+      "nodes": {
+        "planner": {
+          "required_capabilities": {
+            "modalities": ["text"],
+            "tool_use": true
+          },
+          "default_model": "grok-4-1-fast-non-reasoning"
+        },
+        "researcher": {
+          "required_capabilities": {
+            "modalities": ["text"],
+            "tool_use": true
+          },
+          "default_model": "grok-4-1-fast-non-reasoning"
+        },
+        "writer": {
+          "required_capabilities": {
+            "modalities": ["text"],
+            "tool_use": false
+          },
+          "default_model": "grok-4-1-fast-non-reasoning"
+        }
+      }
+    }
+  ],
+  "default_agent": "chat"
+}
+```
+
+**Key fields:**
+- `id`: Unique agent identifier (matches graph ID)
+- `enabled`: Whether agent is available to users
+- `upfront_sats`: Cost per prompt for this agent
+- `file_upload`: File upload capability (`none`, `images`, `pdf`, `all`)
+- `nodes`: Per-node configuration with capability requirements
+
+**Capability-based model selection:**
+Instead of listing allowed models explicitly, each node specifies `required_capabilities`. The frontend/backend filters available models to match these requirements.
+
+### Demo Prompts (demos.json)
+
+Pre-recorded demo prompts for logged-out users:
+
+```json
+{
+  "demos": {
+    "chat": [
+      {
+        "label": "What is PlebChat?",
+        "prompt": "What is PlebChat and how is it different from other AI services?",
+        "response": "PlebChat is an AI chat service...",
+        "usage_metadata": {
+          "payment_sent": 8,
+          "prompt_tokens": 45,
+          "completion_tokens": 180,
+          "total_cost_sats": 1,
+          "refund_sats": 7
+        }
+      }
+    ],
+    "deep-research": [...]
+  }
+}
+```
+
+## API Endpoints
+
+### Agent Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/agent/agents` | GET | List available agents with configuration |
+| `/api/agent/demos` | GET | Get demo prompts for logged-out users |
+| `/api/agent/start/{graph_id}` | POST | Start an agent run with payment |
+
+### Pricing Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/pricing/models` | GET | List available models with sat pricing |
+| `/api/pricing/calculate` | POST | Calculate cost for token usage |
+
+## Frontend Demo Mode
+
+When the backend is unavailable, the frontend falls back to **demo mode**:
+
+1. **Warning toast** displayed: "Backend unavailable - Using demo mode"
+2. **Limited agents** - Only `chat` and `deep-research` available
+3. **Demo prompts** - Pre-recorded responses playback without payment
+4. **No real LLM calls** - Responses are cached/static
+
+The frontend fetches demo prompts from `/api/agent/demos` for logged-out users to try the service.
 
 ## Agent Graph Architecture
 
@@ -187,10 +322,17 @@ The payment flow uses a **backend proxy** architecture:
 
 ### Backend Unavailability
 
-If the backend is unavailable, the agent raises `BackendUnavailableError`:
-- No fallback pricing
-- No hardcoded defaults
+If the backend is unavailable:
+
+**For logged-in users:**
+- Agent raises `BackendUnavailableError`
+- No fallback pricing, no hardcoded defaults
 - Explicit failure with clear error message
+
+**For logged-out users (demo mode):**
+- Frontend shows warning toast
+- Falls back to demo agents (chat, deep-research only)
+- Uses pre-recorded demo prompts from `/api/agent/demos`
 
 This prevents free LLM usage when pricing data is stale or unavailable.
 
@@ -199,8 +341,8 @@ This prevents free LLM usage when pricing data is stale or unavailable.
 Pricing is configured centrally in the backend:
 
 ### Upfront Cost
-- Set in `models.json` as `upfront_sats`
-- Frontend fetches via `GET /api/pricing/models`
+- Set in `agents.json` as `upfront_sats` per agent
+- Frontend fetches via `GET /api/agent/agents`
 - User pays this amount for every prompt
 - **Recommended**: Use power of 2 (8, 16, 32) to minimize Cashu swap fees
 
@@ -259,34 +401,6 @@ Environment variables are referenced in `models.json` using `${VAR}` syntax:
 | `WALLET_URL` | No | Backend wallet URL (default: `http://localhost:8000/api/wallet`) |
 
 **Note:** API keys are stored in the backend's environment variables and referenced in `models.json`. They are injected into the graph's `RunnableConfig` at runtime by the backend proxy.
-
-### Model Configuration (models.json)
-
-```json
-{
-  "models": {
-    "model-id": {
-      "provider": "xai|local|openai",
-      "display_name": "Human-readable name",
-      "base_url": "https://api.example.com/v1",
-      "api_key": "${API_KEY_ENV_VAR}",
-      "pricing": {
-        "input_usd_per_million": 0.30,
-        "output_usd_per_million": 1.00
-      },
-      "modalities": ["text", "vision"],
-      "max_context_tokens": 131072,
-      "enabled": true
-    }
-  },
-  "default_model": "model-id",
-  "upfront_sats": {
-    "default": 8,
-    "chat": 8,
-    "deep-research": 50
-  }
-}
-```
 
 ## Development
 
