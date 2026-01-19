@@ -123,12 +123,6 @@ Pricing and credentials are configured centrally in `backend/data/models.json`:
       "max_context_tokens": 32768,
       "enabled": true
     }
-  },
-  "default_model": "grok-4-1-fast-non-reasoning",
-  "upfront_sats": {
-    "default": 8,
-    "chat": 8,
-    "deep-research": 50
   }
 }
 ```
@@ -136,7 +130,8 @@ Pricing and credentials are configured centrally in `backend/data/models.json`:
 **Key fields:**
 - `api_key` / `base_url`: Support `${ENV_VAR}` syntax for environment variable expansion
 - `pricing`: Nested object with input/output USD pricing per million tokens
-- `upfront_sats`: Per-agent upfront costs (object with agent IDs as keys)
+
+**Note:** Upfront costs are configured per-agent in `agents.json`.
 
 ### Key Pricing Concepts
 
@@ -334,8 +329,7 @@ Get available models with pricing (public endpoint for frontend).
     }
   ],
   "btc_price_usd": 100000.00,
-  "upfront_sats": 8,
-  "default_model": "grok-4-1-fast-non-reasoning"
+  "upfront_sats": { "default": 8, "chat": 8, "deep-research": 50 }
 }
 ```
 
@@ -548,17 +542,12 @@ Edit `backend/data/models.json`:
       "max_context_tokens": 131072,
       "enabled": true
     }
-  },
-  "default_model": "model-id",
-  "upfront_sats": {
-    "default": 8,
-    "chat": 8,
-    "deep-research": 50
   }
 }
 ```
 
 **Tips:**
+- Upfront costs are configured per-agent in `agents.json`
 - Use a power of 2 for `upfront_sats` (8, 16, 32) to minimize Cashu swap fees
 - Use `${ENV_VAR}` syntax to reference environment variables for sensitive values
 - API keys are never exposed to frontend - only injected server-side into `RunnableConfig`

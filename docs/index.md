@@ -62,8 +62,7 @@ Pricing is configured in `backend/data/models.json` (array format with capabilit
       "max_context_tokens": 131072,
       "enabled": true
     }
-  ],
-  "default_model": "grok-4-1-fast-non-reasoning"
+  ]
 }
 ```
 
@@ -81,8 +80,7 @@ Agent configuration is in `backend/data/agents.json`:
       "upfront_sats": 8,
       "nodes": {
         "llm": {
-          "required_capabilities": { "modalities": ["text"], "tool_use": false },
-          "default_model": "grok-4-1-fast-non-reasoning"
+          "required_capabilities": { "modalities": ["text"], "tool_use": false }
         }
       }
     }
@@ -137,16 +135,6 @@ Comprehensive internet research agent with multi-agent architecture. See [Deep R
 - 🌊 **Deep** (~8-15 min) - Maximum comprehensiveness
 
 **File upload:** *no file upload*
-
----
-
-### Socratic Coach ☕️🧠💭
-
-⚠️ DO NOT IMPLEMENT YET
-
-> Dynamic pricing based on token usage.
-
-**File upload:** *images only*
 
 ---
 

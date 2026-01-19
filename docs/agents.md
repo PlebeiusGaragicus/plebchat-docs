@@ -69,14 +69,7 @@ Models are configured as an **array** with explicit IDs and capabilities:
       "max_context_tokens": 131072,
       "enabled": true
     }
-  ],
-  "default_model": "grok-4-1-fast-non-reasoning",
-  "upfront_sats": {
-    "default": 8,
-    "chat": 8,
-    "deep-research": 50,
-    "socratic-coach": 8
-  }
+  ]
 }
 ```
 
@@ -108,8 +101,7 @@ Agents are configured separately from models, with capability-based model select
           "required_capabilities": {
             "modalities": ["text"],
             "tool_use": false
-          },
-          "default_model": "grok-4-1-fast-non-reasoning"
+          }
         }
       }
     },
@@ -126,22 +118,19 @@ Agents are configured separately from models, with capability-based model select
           "required_capabilities": {
             "modalities": ["text"],
             "tool_use": true
-          },
-          "default_model": "grok-4-1-fast-non-reasoning"
+          }
         },
         "researcher": {
           "required_capabilities": {
             "modalities": ["text"],
             "tool_use": true
-          },
-          "default_model": "grok-4-1-fast-non-reasoning"
+          }
         },
         "writer": {
           "required_capabilities": {
             "modalities": ["text"],
             "tool_use": false
-          },
-          "default_model": "grok-4-1-fast-non-reasoning"
+          }
         }
       }
     }

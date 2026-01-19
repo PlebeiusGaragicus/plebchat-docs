@@ -107,7 +107,6 @@ The frontend uses **route-based agent navigation** (client-side only, no SSR):
 | `/` | WelcomePage | Landing page with features and agent selection |
 | `/chat` | ChatContainer | Chat agent interface |
 | `/deep-research` | ChatContainer | Deep Research agent interface |
-| `/socratic-coach` | ChatContainer | Socratic Coach agent interface |
 | `/faq` | FAQ content | Frequently asked questions |
 | `/privacy-policy` | Static content | Privacy policy |
 | `/terms-of-service` | Static content | Terms of service |
@@ -674,7 +673,6 @@ Five agents are configured, with PlebChat and Deep Research currently active.
 |-------|-------|--------|---------|----------|
 | PlebChat | 💬 | **Active** | Dynamic (per-token) | Simple chat, history enabled |
 | Deep Research | 🌎📚🔭 | **Active** | Dynamic (per-token) | Multi-agent research |
-| Socratic Coach | ☕️🧠💭 | Coming Soon | Dynamic (per-token) | Guided learning, image upload |
 | TLDR Summarizer | 📖🤨❓ | Coming Soon | Dynamic (per-token) | Document summarization |
 | NSFW | 🙉🙈🙊 | Coming Soon | Dynamic (per-token) | Unrestricted, no history |
 
@@ -688,7 +686,6 @@ Each agent defines its capabilities and file upload support:
 |-------|-------------|-------------|
 | PlebChat | chat | none |
 | Deep Research | research, analysis | none |
-| Socratic Coach | teaching, discussion | images |
 | TLDR Summarizer | summarization | pdf |
 | NSFW | unrestricted | none |
 
@@ -807,7 +804,6 @@ Fonts are self-hosted for privacy, performance, and consistency (no Google Fonts
 ## Features Not Yet Implemented
 
 ### Coming Soon Agents
-- **Socratic Coach**: Interactive guided learning
 - **TLDR Summarizer**: PDF and document summarization
 - **NSFW**: Unrestricted conversation mode
 
